@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erika Rosillon | Pastel Web Developer & UI/UX Designer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sacramento&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            50: '#fff5f7',
+                            100: '#ffe3ec',
+                            200: '#ffcce0',
+                            300: '#ffa8cb',
+                            400: '#ff75ac',
+                            500: '#f7488e',
+                            600: '#e1226c',
+                        },
+                        twilight: {
+                            800: '#1e1b2e',
+                            900: '#141221',
+                            950: '#0c0a14',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        cursive: ['Sacramento', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 204, 224, 0.5);
+        }
+        .dark .glass-panel {
+            background: rgba(26, 23, 40, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 168, 203, 0.2);
+        }
+
+        .sakura-glow {
+            box-shadow: 0 0 35px -5px rgba(255, 117, 172, 0.4);
+        }
+        .dark .sakura-glow {
+            box-shadow: 0 0 35px -5px rgba(247, 72, 142, 0.3);
+        }
+
+        #petalCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #gardenCanvas {
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff5f7;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #141221;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ffa8cb;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #e1226c;
+        }
+    </style>
+</head>
+<body class="bg-pastel-50 text-slate-800 dark:bg-twilight-950 dark:text-slate-100 min-h-screen relative overflow-x-hidden">
+
+    <!-- Falling Petals Background Canvas -->
+    <canvas id="petalCanvas"></canvas>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-5 py-3.5 rounded-2xl glass-panel shadow-xl border border-pastel-300 dark:border-pastel-500/30 text-sm font-semibold text-slate-800 dark:text-pink-200">
+        <span class="w-8 h-8 rounded-full bg-pastel-200 dark:bg-pastel-600/30 flex items-center justify-center text-pastel-600 dark:text-pastel-300 text-lg">🌸</span>
+        <span id="toastMsg">Action completed!</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-pastel-200/60 dark:border-pastel-900/40">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="relative w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-pastel-300 to-pastel-500 group-hover:scale-105 transition-transform shadow-md overflow-hidden">
+                    <!-- Inline User Photo in Navigation -->
+                    <img id="navAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" 
+                         alt="Erika Rosillon" 
+                         class="w-full h-full rounded-full object-cover">
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-extrabold text-lg tracking-tight text-slate-800 dark:text-white flex items-center gap-1.5">
+                        Erika Rosillon <span class="text-xs">🌸</span>
+                    </span>
+                    <span class="text-xs text-pastel-500 font-medium tracking-wide">Web Developer & UI/UX</span>
+                </div>
+            </a>
+
+            <nav class="hidden md:flex items-center space-x-7 text-sm font-semibold text-slate-600 dark:text-slate-300">
+                <a href="#about" class="hover:text-pastel-500 dark:hover:text-pastel-300 transition-colors">About</a>
+                <a href="#projects" class="hover:text-pastel-500 dark:hover:text-pastel-300 transition-colors">Projects</a>
+                <a href="#skills" class="hover:text-pastel-500 dark:hover:text-pastel-300 transition-colors">Skills</a>
+                <a href="#garden" class="hover:text-pastel-500 dark:hover:text-pastel-300 transition-colors flex items-center gap-1">
+                    Garden <i class="fa-solid fa-seedling text-xs text-emerald-400"></i>
+                </a>
+                <a href="#contact" class="hover:text-pastel-500 dark:hover:text-pastel-300 transition-colors">Contact</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button id="themeToggle" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-slate-600 dark:text-pastel-200 hover:text-pastel-600 transition shadow-sm" title="Toggle Light/Twilight Theme">
+                    <i class="fa-solid fa-moon text-base dark:hidden"></i>
+                    <i class="fa-solid fa-sun text-base hidden dark:block text-amber-300"></i>
+                </button>
+
+                <button onclick="copyToClipboard('rosillonerika@gmail.com', 'Email copied to clipboard!')" class="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-full bg-gradient-to-r from-pastel-400 to-pastel-500 hover:from-pastel-500 hover:to-pastel-600 text-white shadow-md shadow-pastel-400/30 transition-all hover:scale-105">
+                    <i class="fa-solid fa-paper-plane"></i> Let's Talk
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+        <section id="about" class="relative pt-10 pb-20 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col-reverse md:flex-row items-center justify-between gap-12">
+                
+                <div class="flex-1 space-y-6 text-center md:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pastel-100 dark:bg-pastel-900/40 border border-pastel-200 dark:border-pastel-500/20 text-pastel-600 dark:text-pastel-300 text-xs font-bold tracking-wide">
+                        <span class="w-2 h-2 rounded-full bg-pink-400 animate-ping"></span>
+                        Creative Web Developer & UI/UX Designer
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                        Hi, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-pastel-500 via-pink-500 to-purple-400">Erika Rosillon</span>
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl font-normal leading-relaxed">
+                        A 20-year-old developer & designer based in <strong class="text-slate-800 dark:text-pink-200">Imus, Calabarzon, PH</strong>. I design and build aesthetic, modern web apps with soft pastel visuals and elegant interactions.
+                    </p>
+
+                    <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+                        <button onclick="copyToClipboard('rosillonerika@gmail.com', 'Email copied: rosillonerika@gmail.com')" class="px-5 py-3 rounded-2xl glass-panel hover:bg-pastel-100 dark:hover:bg-pastel-900/50 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-2 border border-pastel-200 dark:border-pastel-800">
+                            <i class="fa-solid fa-envelope text-pastel-500"></i> rosillonerika@gmail.com
+                            <i class="fa-solid fa-copy text-xs text-slate-400 ml-1"></i>
+                        </button>
+
+                        <button onclick="copyToClipboard('09773403229', 'Phone copied: 09773403229')" class="px-5 py-3 rounded-2xl glass-panel hover:bg-pastel-100 dark:hover:bg-pastel-900/50 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-2 border border-pastel-200 dark:border-pastel-800">
+                            <i class="fa-solid fa-phone text-pastel-500"></i> 09773403229
+                            <i class="fa-solid fa-copy text-xs text-slate-400 ml-1"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400 pt-1">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-check text-pastel-400"></i> Age: 20</span>
+                        <span>•</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-pastel-400"></i> Calabarzon, PH</span>
+                    </div>
+                </div>
+
+                <!-- Main Profile Picture Frame -->
+                <div class="relative flex-shrink-0">
+                    <div class="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-full p-2.5 bg-gradient-to-tr from-pastel-200 via-pastel-300 to-pastel-500 sakura-glow transition-transform duration-500 hover:scale-105">
+                        <div class="w-full h-full rounded-full overflow-hidden border-4 border-white dark:border-twilight-900 bg-pastel-100 relative group shadow-inner">
+                            
+                            <!-- Embedded Profile Photo -->
+                            <img id="mainAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800" 
+                                 alt="Erika Rosillon Profile Picture" 
+                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            
+                            <div class="absolute inset-0 rounded-full border-2 border-white/40 pointer-events-none"></div>
+                        </div>
+
+                        <!-- Floating Badges -->
+                        <div class="absolute -top-2 -right-2 bg-white dark:bg-twilight-800 p-3 rounded-2xl shadow-lg border border-pastel-200 dark:border-pastel-700/50 flex items-center gap-2 animate-bounce">
+                            <span class="text-xl">🌸</span>
+                            <span class="text-xs font-bold text-slate-700 dark:text-pink-200">UI/UX Designer</span>
+                        </div>
+
+                        <div class="absolute -bottom-2 -left-2 bg-white dark:bg-twilight-800 p-3 rounded-2xl shadow-lg border border-pastel-200 dark:border-pastel-700/50 flex items-center gap-2">
+                            <span class="text-xl">💻</span>
+                            <span class="text-xs font-bold text-slate-700 dark:text-pink-200">Web Developer</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Featured Projects Section -->
+        <section id="projects" class="py-20 relative">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
+                    <h2 class="text-xs font-extrabold uppercase tracking-widest text-pastel-500">Portfolio Highlights</h2>
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Featured Projects 🌸</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Click any card to view detailed design goals, specs, and tech stack.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <div onclick="openModal('EcoBloom UI', 'A sustainable, eco-friendly pastel dashboard designed for tracking household plant care and green living habits.', ['React', 'Tailwind CSS', 'Figma'], 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=600')" class="glass-panel rounded-3xl overflow-hidden p-5 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all cursor-pointer group border border-pastel-200 dark:border-pastel-800/40">
+                        <div class="h-48 rounded-2xl overflow-hidden bg-pastel-100 relative">
+                            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=600" alt="EcoBloom UI" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-3 right-3 bg-white/90 dark:bg-twilight-900/90 text-xs font-bold text-pastel-600 px-3 py-1 rounded-full shadow-sm">UI/UX Design</div>
+                        </div>
+                        <div class="pt-5 space-y-2">
+                            <h4 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-pastel-500 transition-colors">EcoBloom UI</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">Sustainable plant tracking dashboard with intuitive pastel visual statistics.</p>
+                            <div class="flex gap-2 pt-2">
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300">React</span>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300">Tailwind</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="openModal('PastelConnect App', 'A lightweight social connectivity concept designed with soft colors and mental well-being in mind.', ['Figma', 'UI Design', 'HTML/CSS'], 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&q=80&w=600')" class="glass-panel rounded-3xl overflow-hidden p-5 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all cursor-pointer group border border-pastel-200 dark:border-pastel-800/40">
+                        <div class="h-48 rounded-2xl overflow-hidden bg-pastel-100 relative">
+                            <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&q=80&w=600" alt="PastelConnect App" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-3 right-3 bg-white/90 dark:bg-twilight-900/90 text-xs font-bold text-pastel-600 px-3 py-1 rounded-full shadow-sm">Mobile App</div>
+                        </div>
+                        <div class="pt-5 space-y-2">
+                            <h4 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-pastel-500 transition-colors">PastelConnect App</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">A calming mobile platform for genuine peer interactions and wellness.</p>
+                            <div class="flex gap-2 pt-2">
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300">Figma</span>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300">UI/UX</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div onclick="openModal('Sakura Notes', 'A rich web-based note taking application with customizable aesthetic themes and markdown support.', ['JavaScript', 'HTML5', 'CSS3'], 'https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&q=80&w=600')" class="glass-panel rounded-3xl overflow-hidden p-5 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all cursor-pointer group border border-pastel-200 dark:border-pastel-800/40">
+                        <div class="h-48 rounded-2xl overflow-hidden bg-pastel-100 relative">
+                            <img src="https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&q=80&w=600" alt="Sakura Notes" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-3 right-3 bg-white/90 dark:bg-twilight-900/90 text-xs font-bold text-pastel-600 px-3 py-1 rounded-full shadow-sm">Web App</div>
+                        </div>
+                        <div class="pt-5 space-y-2">
+                            <h4 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-pastel-500 transition-colors">Sakura Notes</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">Minimalist note-taking web utility featuring dynamic theme customization.</p>
+                            <div class="flex gap-2 pt-2">
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300">JavaScript</span>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300">CSS3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-pastel-200 dark:border-pastel-800/40 space-y-10">
+                
+                <div class="text-center max-w-xl mx-auto space-y-2">
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Skills & Expertise 🌺</h3>
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Web technologies and design tools I work with daily.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="fa-brands fa-html5 text-orange-400 text-sm"></i> HTML5 & CSS3</span>
+                            <span class="text-pastel-500">95%</span>
+                        </div>
+                        <div class="h-3 w-full bg-pastel-100 dark:bg-twilight-800 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-gradient-to-r from-pastel-300 to-pastel-500 rounded-full" style="width: 95%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="fa-brands fa-js text-yellow-400 text-sm"></i> JavaScript (ES6+)</span>
+                            <span class="text-pastel-500">88%</span>
+                        </div>
+                        <div class="h-3 w-full bg-pastel-100 dark:bg-twilight-800 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-gradient-to-r from-pastel-300 to-pastel-500 rounded-full" style="width: 88%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="fa-brands fa-react text-sky-400 text-sm"></i> React Framework</span>
+                            <span class="text-pastel-500">82%</span>
+                        </div>
+                        <div class="h-3 w-full bg-pastel-100 dark:bg-twilight-800 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-gradient-to-r from-pastel-300 to-pastel-500 rounded-full" style="width: 82%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="fa-solid fa-code text-teal-400 text-sm"></i> Tailwind CSS</span>
+                            <span class="text-pastel-500">90%</span>
+                        </div>
+                        <div class="h-3 w-full bg-pastel-100 dark:bg-twilight-800 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-gradient-to-r from-pastel-300 to-pastel-500 rounded-full" style="width: 90%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="fa-brands fa-figma text-purple-400 text-sm"></i> Figma & UI/UX Design</span>
+                            <span class="text-pastel-500">85%</span>
+                        </div>
+                        <div class="h-3 w-full bg-pastel-100 dark:bg-twilight-800 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-gradient-to-r from-pastel-300 to-pastel-500 rounded-full" style="width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-800 dark:text-slate-200 flex items-center gap-2"><i class="fa-brands fa-git-alt text-red-400 text-sm"></i> Git & Version Control</span>
+                            <span class="text-pastel-500">80%</span>
+                        </div>
+                        <div class="h-3 w-full bg-pastel-100 dark:bg-twilight-800 rounded-full overflow-hidden p-0.5">
+                            <div class="h-full bg-gradient-to-r from-pastel-300 to-pastel-500 rounded-full" style="width: 80%;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Pastel Garden Section -->
+        <section id="garden" class="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-pastel-200 dark:border-pastel-800/40 space-y-6">
+                
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-pastel-200/60 dark:border-pastel-800/40 pb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            Interactive Pastel Garden 🌷
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">
+                            Click or tap anywhere on the canvas below to plant dynamic pastel flowers!
+                        </p>
+                    </div>
+                    <button onclick="clearGarden()" class="px-4 py-2 rounded-xl text-xs font-bold bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300 hover:bg-pastel-200 transition">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Clear Garden
+                    </button>
+                </div>
+
+                <div class="relative w-full h-80 rounded-2xl overflow-hidden bg-gradient-to-b from-pastel-50 to-pastel-100 dark:from-twilight-900 dark:to-twilight-800 border border-pastel-200 dark:border-pastel-700/50">
+                    <canvas id="gardenCanvas" class="w-full h-full"></canvas>
+                    <div class="absolute bottom-3 right-3 pointer-events-none text-[11px] font-semibold text-pastel-500 dark:text-pastel-300 bg-white/80 dark:bg-twilight-950/80 px-3 py-1 rounded-full shadow-sm">
+                        Total Blossoms: <span id="flowerCount">0</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Contact & Footer -->
+        <section id="contact" class="py-16 text-center max-w-4xl mx-auto px-4">
+            <div class="space-y-6">
+                <span class="text-4xl">🌸</span>
+                <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white">Let's Create Something Beautiful Together</h3>
+                <p class="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">
+                    Feel free to reach out for web development projects, UI designs, or collaborations!
+                </p>
+
+                <div class="flex justify-center gap-4 pt-2">
+                    <a href="mailto:rosillonerika@gmail.com" class="px-6 py-3.5 rounded-full bg-gradient-to-r from-pastel-400 to-pastel-500 hover:from-pastel-500 hover:to-pastel-600 text-white font-bold text-sm shadow-lg shadow-pastel-400/30 transition-all hover:scale-105 flex items-center gap-2">
+                        <i class="fa-solid fa-envelope"></i> Email Erika
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-8 border-t border-pastel-200/60 dark:border-pastel-900/40 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p>© 2026 Erika Rosillon. Designed with pastel elegance & floral touches.</p>
+    </footer>
+
+    <!-- Project Modal Popup -->
+    <div id="projectModal" class="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-3xl p-6 sm:p-8 space-y-5 border border-pastel-300 dark:border-pastel-700/60 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            
+            <button onclick="closeModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-pastel-100 dark:bg-twilight-800 text-slate-500 hover:text-pastel-600 flex items-center justify-center text-sm font-bold transition">
+                ✕
+            </button>
+
+            <div class="h-48 rounded-2xl overflow-hidden bg-pastel-100">
+                <img id="modalImg" src="" alt="Project" class="w-full h-full object-cover">
+            </div>
+
+            <div class="space-y-3">
+                <h3 id="modalTitle" class="text-2xl font-bold text-slate-900 dark:text-white">Project Title</h3>
+                <p id="modalDesc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Project description goes here.</p>
+                
+                <div class="pt-2">
+                    <span class="text-xs font-bold text-pastel-500 block mb-2">Technologies Used:</span>
+                    <div id="modalTags" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-pastel-200/60 dark:border-pastel-800/40 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2.5 rounded-full bg-pastel-500 text-white font-bold text-xs hover:bg-pastel-600 transition shadow-md">
+                    Close Preview
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Theme Toggle ---
+        const themeToggleBtn = document.getElementById('themeToggle');
+        themeToggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // --- Toast Clipboard ---
+        function copyToClipboard(text, message) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.innerText = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // --- Modal Controls ---
+        function openModal(title, desc, tags, imgUrl) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalImg').src = imgUrl;
+
+            const tagsContainer = document.getElementById('modalTags');
+            tagsContainer.innerHTML = '';
+            tags.forEach(tag => {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'text-[11px] font-bold px-3 py-1 rounded-full bg-pastel-100 dark:bg-twilight-800 text-pastel-600 dark:text-pastel-300';
+                tagSpan.innerText = tag;
+                tagsContainer.appendChild(tagSpan);
+            });
+
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // --- Falling Petals Animation Canvas ---
+        const petalCanvas = document.getElementById('petalCanvas');
+        const pCtx = petalCanvas.getContext('2d');
+        let petals = [];
+
+        function resizePetalCanvas() {
+            petalCanvas.width = window.innerWidth;
+            petalCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizePetalCanvas);
+        resizePetalCanvas();
+
+        class Petal {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * petalCanvas.width;
+                this.y = -20;
+                this.size = Math.random() * 8 + 6;
+                this.speedY = Math.random() * 1.5 + 0.8;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.rotation = Math.random() * 360;
+                this.rotSpeed = Math.random() * 2 - 1;
+                this.opacity = Math.random() * 0.5 + 0.3;
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.y / 30) + this.speedX;
+                this.rotation += this.rotSpeed;
+
+                if (this.y > petalCanvas.height + 20) {
+                    this.reset();
+                }
+            }
+            draw() {
+                pCtx.save();
+                pCtx.translate(this.x, this.y);
+                pCtx.rotate((this.rotation * Math.PI) / 180);
+                pCtx.globalAlpha = this.opacity;
+                pCtx.fillStyle = '#ffcce0';
+                pCtx.beginPath();
+                pCtx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
+                pCtx.fill();
+                pCtx.restore();
+            }
+        }
+
+        for (let i = 0; i < 35; i++) {
+            petals.push(new Petal());
+        }
+
+        function animatePetals() {
+            pCtx.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+            petals.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animatePetals);
+        }
+        animatePetals();
+
+        // --- Interactive Garden Canvas ---
+        const gCanvas = document.getElementById('gardenCanvas');
+        const gCtx = gCanvas.getContext('2d');
+        let flowers = [];
+
+        function resizeGardenCanvas() {
+            const rect = gCanvas.parentElement.getBoundingClientRect();
+            gCanvas.width = rect.width;
+            gCanvas.height = rect.height;
+            drawGarden();
+        }
+        window.addEventListener('resize', resizeGardenCanvas);
+
+        class Flower {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 0;
+                this.maxSize = Math.random() * 14 + 12;
+                this.color = ['#ffa8cb', '#ffcce0', '#ff75ac', '#f7488e', '#f472b6'][Math.floor(Math.random() * 5)];
+                this.petals = Math.floor(Math.random() * 3) + 5;
+            }
+            grow() {
+                if (this.size < this.maxSize) {
+                    this.size += 0.8;
+                }
+            }
+            draw() {
+                gCtx.save();
+                gCtx.translate(this.x, this.y);
+                
+                // Stem
+                gCtx.strokeStyle = '#a7f3d0';
+                gCtx.lineWidth = 2;
+                gCtx.beginPath();
+                gCtx.moveTo(0, 0);
+                gCtx.lineTo(0, 30);
+                gCtx.stroke();
+
+                // Petals
+                gCtx.fillStyle = this.color;
+                for (let i = 0; i < this.petals; i++) {
+                    const angle = (i * (2 * Math.PI)) / this.petals;
+                    const px = Math.cos(angle) * (this.size / 1.5);
+                    const py = Math.sin(angle) * (this.size / 1.5);
+                    gCtx.beginPath();
+                    gCtx.arc(px, py, this.size / 2, 0, Math.PI * 2);
+                    gCtx.fill();
+                }
+
+                // Center
+                gCtx.fillStyle = '#fef08a';
+                gCtx.beginPath();
+                gCtx.arc(0, 0, this.size / 3, 0, Math.PI * 2);
+                gCtx.fill();
+
+                gCtx.restore();
+            }
+        }
+
+        function addFlower(e) {
+            const rect = gCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            flowers.push(new Flower(x, y));
+            document.getElementById('flowerCount').innerText = flowers.length;
+        }
+
+        gCanvas.addEventListener('click', addFlower);
+
+        function drawGarden() {
+            gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+            flowers.forEach(f => {
+                f.grow();
+                f.draw();
+            });
+            requestAnimationFrame(drawGarden);
+        }
+
+        window.onload = function() {
+            resizeGardenCanvas();
+            drawGarden();
+        };
+
+        function clearGarden() {
+            flowers = [];
+            document.getElementById('flowerCount').innerText = '0';
+        }
+    </script>
+</body>
+</html>
